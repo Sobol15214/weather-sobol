@@ -12,11 +12,9 @@
                     '</div>');
         };
 
-        this.getWeatherData = function () {
-            var lat = 47.8388; // Широта Запорожья
-            var lon = 35.1396; // Долгота Запорожья
+        this.getWeatherData = function (lat, lon) {
             var API_KEY = "46a5d8546cc340f69d9123207242801";
-            var url = 'http://api.weatherapi.com/v1/current.json?key=' + API_KEY + '&q=' + lat + ',' + lon + '&lang=ru&aqi=no';
+			var url = 'http://api.weatherapi.com/v1/current.json?key=46a5d8546cc340f69d9123207242801&q=' +  lat + ',' + lon + '&lang=ru&aqi=no';
 
             network.clear();
             network.timeout(5000);
@@ -24,11 +22,12 @@
         };
 
         function processWeatherData(result) {
+            var data1 = result.location;
             var data2 = result.current;
             var temp = Math.floor(data2.temp_c); // Температура
-            console.log("Погода", "Температура: " + temp);
-            var condition = data2.condition.text; // Обстановка
-            console.log("Погода", "Обстановка: " + condition);
+				console.log("Погода", "Температура: " + temp)
+            var condition = data2.condition.text;// Обстановка
+				console.log("Погода", "Обстановка: " + condition)
 
             $('#weather-temp').text(temp + '°');
             $('#weather-condition').text(condition).toggleClass('long-text', condition.length > 10);
@@ -39,7 +38,10 @@
         }
 
         this.getWeather = function () {
-            this.getWeatherData();
+            // Координаты Запорожья
+            var lat = 47.8388;
+            var lon = 35.1396;
+            this.getWeatherData(lat, lon);
         };
 
         this.render = function () {
@@ -59,10 +61,12 @@
 
     $(document).ready(function () {
         setTimeout(function(){
+            // Создаем интерфейс погоды
             weatherInterface.create();
             var weatherWidget = weatherInterface.render();
             $('.head__time').after(weatherWidget);
 
+            // Функция для переключения между отображением времени и виджета погоды
             function toggleDisplay() {
                 if (isTimeVisible) {
                     $('.head__time').hide();
@@ -74,10 +78,13 @@
                 isTimeVisible = !isTimeVisible;
             }
 
+            // Устанавливаем интервал для переключения между временем и погодой каждые 10 секунд
             setInterval(toggleDisplay, 10000);
 
+            // Получаем начальные данные о погоде
             weatherInterface.getWeather();
 
+            // Скрываем виджет погоды при загрузке страницы
             $('.weather-widget').hide();
             var width_element = document.querySelector('.head__time');
             console.log(width_element.offsetWidth);
